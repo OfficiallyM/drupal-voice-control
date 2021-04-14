@@ -1,5 +1,4 @@
-# drupal-voice-control
-Drupal 7 voice control module
+# Drupal 7 voice control
 
 Allows for Drupal 7 websites to be controlled via voice commands.
 
