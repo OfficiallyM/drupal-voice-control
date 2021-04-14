@@ -1,0 +1,4 @@
+name = Voice control
+description = Control Drupal using your voice.
+package = Voice
+core = 7.x

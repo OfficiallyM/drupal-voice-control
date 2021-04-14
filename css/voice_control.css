@@ -1,0 +1,10 @@
+#voice-control-start {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  border: 1px solid black;
+  border-radius: 16px;
+  padding: 5px;
+  cursor: pointer;
+  background: red;
+}

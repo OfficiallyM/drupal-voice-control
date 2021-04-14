@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function voice_control_menu() {
+  return array(
+    'admin/config/voice-control' => array(
+      'title' => 'Voice control',
+      'description' => 'Configure voice control settings.',
+      'position' => 'right',
+      'weight' => -20,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array('administer site configuration'),
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+    ),
+
+    'admin/config/voice-control/basic' => array(
+      'title' => 'Basic settings',
+      'description' => 'Basic voice control settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('voice_control_basic_form'),
+      'file' => 'includes/voice_control.admin.inc',
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+      'weight' => 0,
+    ),
+  );
+}
+
+/**
+ * Implements hook_page_build().
+ */
+function voice_control_page_build(&$page) {
+  if (variable_get('voice_control_enabled', TRUE)) {
+    drupal_add_js(drupal_get_path('module', 'voice_control') .'/js/voice_control.js', 'file');
+    drupal_add_css(drupal_get_path('module', 'voice_control') .'/css/voice_control.css', 'file');
+
+    $controls = voice_control_load_controls();
+
+    if (!empty($controls)) {
+      foreach ($controls as $control) {
+        drupal_add_js($control, 'file');
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to load control files.
+ */
+function voice_control_load_controls() {
+  $controls = array();
+  $controls['click'] = drupal_get_path('module', 'voice_control') .'/controls/click.js';
+
+  drupal_alter('add_voice_control', $controls);
+
+  return $controls;
+}
