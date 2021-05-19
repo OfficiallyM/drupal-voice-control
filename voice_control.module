@@ -5,7 +5,7 @@
  */
 function voice_control_menu() {
   return array(
-    'admin/config/voice-control' => array(
+    'admin/config/voice-control' => array (
       'title' => 'Voice control',
       'description' => 'Configure voice control settings.',
       'position' => 'right',
@@ -18,9 +18,20 @@ function voice_control_menu() {
 
     'admin/config/voice-control/basic' => array(
       'title' => 'Basic settings',
-      'description' => 'Basic voice control settings',
+      'description' => 'Basic voice control settings.',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('voice_control_basic_form'),
+      'file' => 'includes/voice_control.admin.inc',
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+      'weight' => 0,
+    ),
+
+    'admin/config/voice-control/controls' => array(
+      'title' => 'Controls',
+      'description' => 'List and configuration of voice controls.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('voice_control_controls_form'),
       'file' => 'includes/voice_control.admin.inc',
       'access arguments' => array('administer site configuration'),
       'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
@@ -40,8 +51,14 @@ function voice_control_page_build(&$page) {
     $controls = voice_control_load_controls();
 
     if (!empty($controls)) {
-      foreach ($controls as $control) {
-        drupal_add_js($control, 'file');
+      foreach ($controls as $id => $control) {
+        if (!is_array($control) || !isset($control['path'])) {
+          // Return early if control is not configured correctly.
+          watchdog('voice_control', 'Invalid configuration for control module %id', array('%id' => $id), WATCHDOG_WARNING);
+          return;
+        }
+
+        drupal_add_js($control['path'], 'file');
       }
     }
   }
@@ -52,7 +69,11 @@ function voice_control_page_build(&$page) {
  */
 function voice_control_load_controls() {
   $controls = array();
-  $controls['click'] = drupal_get_path('module', 'voice_control') .'/controls/click.js';
+  $controls['click'] = array(
+    'title' => 'Click',
+    'description' => 'Provide functionality for clicking anchor tags.',
+    'path' => drupal_get_path('module', 'voice_control') . '/controls/click.js',
+  );
 
   drupal_alter('add_voice_control', $controls);
 
